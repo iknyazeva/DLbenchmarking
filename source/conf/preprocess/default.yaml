@@ -1,0 +1,5 @@
+pipeline:
+  # This pipeline only has one step: apply Mixup to all input tensors.
+  - function: "mixup_data_by_class"
+    inputs: ["time_series", "node_feature", "label"]
+    outputs: ["time_series", "node_feature", "label"]

@@ -1,0 +1,10 @@
+name: abide
+batch_size: 40
+test_batch_size: 20
+val_batch_size: 20
+train_set: 0.7
+val_set: 0.1
+path: /Users/irinaknyazeva/Yandex.Disk.localized/Projects/BrainIHBProjects/LabNeuroimagingProjects/DLfMRI/datasets/abide.npy
+stratified: True
+node_sz: 200
+drop_last: True

@@ -1,0 +1,6 @@
+name: SupervisedTraining
+epochs: 100
+class_name: SupervisedTrainer 
+module_name: supervised_trainer 
+patience: 20
+log_artifacts: True

@@ -1,0 +1,19 @@
+name: mlp_transform
+# This pipeline runs ONLY during training.
+train_pipeline:
+  # Step 1: Flatten the Pearson matrix (structural).
+  - function: "pearson_to_vector"
+    inputs: ["node_feature"]
+    outputs: ["node_feature"]
+
+  # Step 2: Apply Mixup augmentation.
+  - function: "mixup_data_by_class"
+    inputs: ["node_feature", "label"]
+    outputs: ["node_feature", "label"]
+
+# This pipeline runs during validation and testing.
+eval_pipeline:
+  # It only contains the necessary structural transformation. No augmentation.
+  - function: "pearson_to_vector"
+    inputs: ["node_feature"]
+    outputs: ["node_feature"]

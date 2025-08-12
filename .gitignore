@@ -1,0 +1,8 @@
+.vscode
+*__pycache__*
+*.npy
+*.pt
+mlruns/*
+result/*
+outputs/*
+.venv
