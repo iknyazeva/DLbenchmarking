@@ -1,4 +1,4 @@
-name: mlp_transform_no_mixup
+name: vector_no_mixup
 # This pipeline runs ONLY during training.
 train_pipeline:
   # Step 1: Flatten the Pearson matrix (structural).

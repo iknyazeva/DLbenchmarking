@@ -1,0 +1,5 @@
+name: MLP
+hidden_layers: [100, 10]
+dropout_rate: 0.3
+preserve_checkpoints: False
+forward_inputs: ["node_feature"]

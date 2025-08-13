@@ -13,33 +13,35 @@ from utils import flatten_dict
 import hydra
 
 
+def model_training(cfg: DictConfig):
+    
+    with open_dict(cfg):
+        cfg.unique_id = f"{cfg.model.name}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+        #cfg.dataset.node_sz = 200 
+        cfg.run_dir = str(Path(cfg.log_path) / cfg.unique_id)
+        mlflow.set_experiment(cfg.get("experiment_name", "DefaultExperiment"))
+    with mlflow.start_run(run_name=cfg.unique_id) as run:
+
+        logger = logger_factory(cfg)
+        logger.info(f"Starting MLflow Run: {run.info.run_id}")
+        flat_cfg = flatten_dict(OmegaConf.to_container(cfg, resolve=True))
+        mlflow.log_params(flat_cfg)
+        logger.info("Logged configuration parameters to MLflow.")
+
+        dataloaders = dataset_factory(cfg)
+        model = model_factory(cfg)
+        optimizers = optimizers_factory(cfg, model=model)
+        lr_schedulers = lr_schedulers_factory(cfg=cfg)
+        trainer = trainer_factory(cfg, model, optimizers, lr_schedulers, dataloaders,logger)
+
+        trainer.run()
+        logger.info("MLflow run finished.")
 
 
+@hydra.main(version_base=None, config_path="source/conf", config_name="config")
+def main(cfg: DictConfig):
+    for _ in range(cfg.repeat_time):
+        model_training(cfg)
 
-with hydra.initialize(config_path="source/conf", version_base=None):  # version_base ensures compatibility; adjust if needed
-    # Compose the config, specifying config_name here
-    cfg: DictConfig = hydra.compose(config_name="config_mlp", overrides=["model=mlp"]) 
-with open_dict(cfg):
-    cfg.unique_id = f"{cfg.model.name}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
-    #cfg.dataset.node_sz = 200 
-    cfg.run_dir = str(Path(cfg.log_path) / cfg.unique_id)
-
-mlflow.set_experiment(cfg.get("mlp", "MLPExperiment"))
-with mlflow.start_run(run_name=cfg.unique_id) as run:
-
-    logger = logger_factory(cfg)
-    logger.info(f"Starting MLflow Run: {run.info.run_id}")
-    flat_cfg = flatten_dict(OmegaConf.to_container(cfg, resolve=True))
-    mlflow.log_params(flat_cfg)
-    logger.info("Logged configuration parameters to MLflow.")
-
-    dataloaders = dataset_factory(cfg)
-    model = model_factory(cfg)
-    optimizers = optimizers_factory(cfg, model=model)
-    lr_schedulers = lr_schedulers_factory(cfg=cfg)
-    trainer = trainer_factory(cfg, model, optimizers, lr_schedulers, dataloaders,logger)
-
-    trainer.run()
-    logger.info("MLflow run finished.")
-
-
+if __name__ == '__main__':
+    main()
