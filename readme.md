@@ -8,13 +8,6 @@ Brain Network Transformer is the open-source implementation of the NeurIPS 2022 
 
 Download the ABIDE dataset from [here](https://drive.google.com/file/d/14UGsikYH_SQ-d_GvY2Um2oEHw3WNxDY3/view?usp=sharing).
 
-## Usage
-Of course. Here is the `README.md` file formatted in Markdown.
-
----
-
-# Brain Network Transformer Project
-
 This project provides a flexible, configuration-driven framework for training and evaluating deep learning models on brain network data. It uses [Hydra](https://hydra.cc/) for configuration management and [MLflow](https://mlflow.org/) for experiment tracking.
 
 ## Quickstart
