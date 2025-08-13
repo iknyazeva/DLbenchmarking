@@ -6,3 +6,6 @@ mlruns/*
 result/*
 outputs/*
 .venv
+.DS_Store
+!/mlruns/.gitkeep 
+!/result/.gitkeep
