@@ -15,6 +15,7 @@ import hydra
 
 
 
+
 with hydra.initialize(config_path="source/conf", version_base=None):  # version_base ensures compatibility; adjust if needed
     # Compose the config, specifying config_name here
     cfg: DictConfig = hydra.compose(config_name="config_mlp", overrides=["model=mlp"]) 
