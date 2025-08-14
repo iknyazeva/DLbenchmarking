@@ -1,4 +1,4 @@
-from .transformer import GraphTransformer
+from .graphtransformer import GraphTransformer
 from omegaconf import DictConfig
 from .brainnetcnn import BrainNetCNN
 from .fbnetgen import FBNETGEN

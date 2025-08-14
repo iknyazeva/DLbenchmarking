@@ -1,0 +1,9 @@
+name: inclass_node_mixup
+# This pipeline runs ONLY during training.
+train_pipeline:
+  # Step 2: Apply Mixup augmentation.
+  - function: "mixup_data_by_class"
+    inputs: ["node_feature", "label"]
+    outputs: ["node_feature", "label"]
+
+eval_pipeline: []

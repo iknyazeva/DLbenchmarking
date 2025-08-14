@@ -1,5 +1,5 @@
 name: SupervisedTraining
-epochs: 10
+epochs: 3
 class_name: SupervisedTrainer 
 module_name: supervised_trainer 
 patience: 2
