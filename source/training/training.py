@@ -29,7 +29,7 @@ def model_training(cfg: DictConfig):
         model = model_factory(cfg)
         optimizers = optimizers_factory(cfg, model=model)
         lr_schedulers = lr_schedulers_factory(cfg=cfg)
-        trainer = trainer_factory(cfg, model, optimizers, lr_schedulers, dataloaders,logger)
+        trainer = trainer_factory(cfg, model, optimizers, lr_schedulers, dataloaders, logger)
 
         trainer.run()
         logger.info("MLflow run finished.")

@@ -4,7 +4,7 @@ from source.utils import set_seed
 import hydra
 from source.training import model_training
 
-@hydra.main(version_base=None, config_path="source/conf", config_name="config_graph_transformer")
+@hydra.main(version_base=None, config_path="source/conf", config_name="config_meanmlp")
 def main(cfg: DictConfig):
     set_seed(cfg.seed)
     for _ in range(cfg.repeat_time):
