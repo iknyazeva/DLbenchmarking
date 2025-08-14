@@ -14,35 +14,46 @@ class GraphTransformer(BaseModel):
         self.attention_list = nn.ModuleList()
         self.readout = cfg.model.readout
         self.node_num = cfg.dataset.node_sz
+        self.feature_dim = cfg.model.embedding_size if hasattr(cfg.model, 'embedding_size') else cfg.dataset.node_feature_sz 
+
+        # Optional input projection
+        if hasattr(cfg.model, 'embedding_size') and cfg.model.embedding_size != cfg.dataset.node_feature_sz:
+            self.input_projection = nn.Linear(cfg.dataset.node_feature_sz, self.feature_dim)
+        else:
+            self.input_projection = nn.Identity()
 
         for _ in range(cfg.model.self_attention_layer):
             self.attention_list.append(
-                TransformerEncoderLayer(d_model=cfg.dataset.node_feature_sz, nhead=4, dim_feedforward=1024,
-                                        batch_first=True)
+                TransformerEncoderLayer(d_model=self.feature_dim, nhead=cfg.model.nhead, dropout=0.1,
+                                        dim_feedforward=cfg.model.dim_feedforward,batch_first=True)
             )
 
-        final_dim = cfg.dataset.node_feature_sz
+        if cfg.model.embedding_size:
+            final_dim = cfg.model.embedding_size
+        else:
+            final_dim = cfg.dataset.node_feature_sz
 
         if self.readout == "concat":
             self.dim_reduction = nn.Sequential(
-                nn.Linear(cfg.dataset.node_feature_sz, 8),
+                nn.Linear(final_dim, cfg.model.dim_reduction),
                 nn.LeakyReLU()
             )
-            final_dim = 8 * self.node_num
+            final_dim = cfg.model.dim_reduction * self.node_num
 
         elif self.readout == "sum":
-            self.norm = nn.BatchNorm1d(cfg.dataset.node_feature_sz)
+            self.norm = nn.BatchNorm1d(final_dim)
 
         self.fc = nn.Sequential(
-            nn.Linear(final_dim, 256),
+            nn.Linear(final_dim, 128),
             nn.LeakyReLU(),
-            nn.Linear(256, 32),
+            nn.Linear(128, 16),
             nn.LeakyReLU(),
-            nn.Linear(32, 2)
+            nn.Linear(16, 2)
         )
 
-    def forward(self, time_seires, node_feature):
+    def forward(self, node_feature):
         bz, _, _, = node_feature.shape
+        node_feature = self.input_projection(node_feature)
 
         for atten in self.attention_list:
             node_feature = atten(node_feature)
@@ -61,5 +72,4 @@ class GraphTransformer(BaseModel):
 
         return self.fc(node_feature)
 
-    def get_attention_weights(self):
-        return [atten.get_attention_weights() for atten in self.attention_list]
+

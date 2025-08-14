@@ -1,0 +1,8 @@
+name: GraphTransformer
+self_attention_layer: 2
+dim_feedforward: 128
+nhead: 1
+embedding_size: 20
+dim_reduction: 8
+readout: concat
+forward_inputs: ["node_feature"]

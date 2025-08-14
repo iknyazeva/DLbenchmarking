@@ -59,9 +59,10 @@ def init_dataloader(cfg: DictConfig, *data_tuple) -> List[utils.DataLoader]:
 
     _update_config_with_steps(cfg, train_length)
 
+    generator = torch.Generator().manual_seed(cfg.seed)
     full_dataset = utils.TensorDataset(final_timeseires, final_pearson, labels)
     train_dataset, val_dataset, test_dataset = utils.random_split(
-        full_dataset, [train_length, val_length, test_length]
+        full_dataset, [train_length, val_length, test_length], generator=generator
     )
     
     return _create_dataloaders_from_datasets(cfg, train_dataset, val_dataset, test_dataset)
@@ -84,13 +85,14 @@ def init_stratified_dataloader(cfg: DictConfig, *data_tuple) -> List[utils.DataL
 
     # First split: Separate training set from (validation + test) set
     split1 = StratifiedShuffleSplit(
-        n_splits=1, test_size=(val_length + test_length), train_size=train_length, random_state=42
+        n_splits=1, test_size=(val_length + test_length), train_size=train_length, random_state=cfg.seed
+
     )
     train_idx, val_test_idx = next(split1.split(final_timeseires, site_info))
     
     # Second split: Separate validation and test sets from the remainder
     val_test_site_info = site_info[val_test_idx]
-    split2 = StratifiedShuffleSplit(n_splits=1, test_size=test_length, random_state=42)
+    split2 = StratifiedShuffleSplit(n_splits=1, test_size=test_length, random_state=cfg.seed)
     val_idx_rel, test_idx_rel = next(split2.split(final_timeseires[val_test_idx], val_test_site_info))
     
     # Convert relative indices to absolute indices

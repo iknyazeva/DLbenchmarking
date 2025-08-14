@@ -1,5 +1,5 @@
-pipeline:
-  # This pipeline only has one step: apply Mixup to all input tensors.
-  - function: "mixup_data_by_class"
-    inputs: ["time_series", "node_feature", "label"]
-    outputs: ["time_series", "node_feature", "label"]
+name: default
+# The training pipeline is empty.
+train_pipeline: []
+# The evaluation pipeline is also empty.
+eval_pipeline: []

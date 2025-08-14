@@ -1,0 +1,14 @@
+defaults:
+  - dataset: ABIDE
+  - model: mlp2hl # brainnetcnn, fbnetgen, bnt, transformer
+  - optimizer: adam
+  - training: basic_supervised
+  - datasz: 100p
+  - preprocess: mlp_no_mixup
+
+repeat_time: 2
+log_path: result
+experiment_name: MLPexperiments
+seed: 42
+
+project: DLBenchmarking

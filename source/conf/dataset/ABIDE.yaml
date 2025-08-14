@@ -7,4 +7,5 @@ val_set: 0.1
 path: /Users/irinaknyazeva/Yandex.Disk.localized/Projects/BrainIHBProjects/LabNeuroimagingProjects/DLfMRI/datasets/abide.npy
 stratified: True
 node_sz: 200
+node_feature_sz: 200
 drop_last: True
