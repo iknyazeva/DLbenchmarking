@@ -10,7 +10,7 @@ from tqdm import tqdm
 from pathlib import Path
 from omegaconf import DictConfig
 from typing import List, Dict
-from utils import EarlyStopping
+from source.utils import EarlyStopping
 
 class BaseTrainer(ABC):
     """

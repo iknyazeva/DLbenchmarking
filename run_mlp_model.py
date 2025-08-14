@@ -1,8 +1,8 @@
 from omegaconf import OmegaConf, DictConfig, open_dict
 import numpy as np
-from utils import set_seed
+from source.utils import set_seed
 import hydra
-from training import model_training
+from source.training import model_training
 
 @hydra.main(version_base=None, config_path="source/conf", config_name="config_mlp")
 def main(cfg: DictConfig):

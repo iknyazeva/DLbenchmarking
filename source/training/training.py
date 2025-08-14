@@ -7,7 +7,7 @@ from source.models import MLP
 from source.factories import  dataset_factory, model_factory
 from source.factories import optimizers_factory, logger_factory, lr_schedulers_factory, trainer_factory
 from datetime import datetime
-from utils import flatten_dict, set_seed
+from source.utils import flatten_dict, set_seed
 
 
 def model_training(cfg: DictConfig):

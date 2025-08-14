@@ -6,9 +6,9 @@ from omegaconf import DictConfig
 from torch.utils import data as utils
 import torch
 # Import your data loading functions and models
-from dataset.dataloader import init_stratified_dataloader, init_dataloader # Assuming this is your stratified loader
-from components import LRScheduler, get_param_group_no_wd
-from components.logger import set_file_handler
+from source.dataset.dataloader import init_stratified_dataloader, init_dataloader # Assuming this is your stratified loader
+from source.components import LRScheduler, get_param_group_no_wd
+from source.components.logger import set_file_handler
 
 
 def dataset_factory(cfg: DictConfig) -> List[torch.utils.data.DataLoader]:
