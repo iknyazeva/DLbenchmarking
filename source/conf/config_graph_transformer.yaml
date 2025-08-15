@@ -1,5 +1,5 @@
 defaults:
-  - dataset: ABIDE
+  - dataset: EOEC
   - model: graph_transformer
   - optimizer: adam
   - training: basic_supervised
