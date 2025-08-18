@@ -1,8 +1,8 @@
 from .graphtransformer import GraphTransformer
 from omegaconf import DictConfig
 from .brainnetcnn import BrainNetCNN
+from .brainnetworktransformer import BrainNetworkTransformer
 from .fbnetgen import FBNETGEN
-from .BNT import BrainNetworkTransformer
 from .mlp import MLP
 
 
