@@ -1,14 +1,14 @@
 defaults:
-  - dataset: EOEC
-  - model: graph_transformer
+  - dataset: ABIDE
+  - model: meanmlp # mlp2hl, fbnetgen, bnt, transformer
   - optimizer: adam
   - training: basic_supervised
   - datasz: 100p
-  - preprocess: inclass_node_mixup
+  - preprocess: default
 
 repeat_time: 5
 log_path: result
-experiment_name: GraphTransformerExperiments
+experiment_name: MeanMLPexperiments
 seed: 42
 
 project: DLBenchmarking

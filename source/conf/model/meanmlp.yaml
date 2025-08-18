@@ -1,0 +1,7 @@
+name: MeanMLP
+hidden_size: 256
+num_layers: 3
+output_size: 2
+dropout_rate: 0.3
+preserve_checkpoints: False
+forward_inputs: ["time_series"]
