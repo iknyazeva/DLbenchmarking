@@ -1,7 +1,7 @@
 # seq, gnn, fbnetgen 
 name: BrainNetworkTransformer
-dim_feedforward: 256 #1024 in original
-nhead: 2
+dim_feedforward: 1024 #1024 in original
+nhead: 4
 dim_reduction: 8
 sizes: [200, 100]  # Note: The input node size should not be included here, number of elements equal to number of attention layers
 pooling: [false, true]
