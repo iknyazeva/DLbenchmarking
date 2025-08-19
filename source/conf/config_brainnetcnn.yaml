@@ -1,5 +1,5 @@
 defaults:
-  - dataset: EOEC
+  - dataset: ABIDE_SCH
   - model: brainnetcnn # mlp2hl, fbnetgen, bnt, transformer
   - optimizer: adam
   - training: basic_supervised
