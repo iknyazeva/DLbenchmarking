@@ -1,14 +1,14 @@
 # seq, gnn, fbnetgen 
 name: BrainNetworkTransformer
-dim_feedforward: 128
-nhead: 4
-embedding_size: 20
+dim_feedforward: 256 #1024 in original
+nhead: 2
 dim_reduction: 8
-sizes: [360, 100]  # Note: The input node size should not be included here, number of elements equal to number of attention layers
+sizes: [200, 100]  # Note: The input node size should not be included here, number of elements equal to number of attention layers
 pooling: [false, true]
-pos_encoding: none  # identity, none
+pos_encoding:
+ name: RRWPEncoding  # IdentityEncoding, RRWPEncoding, none
+ embed_dim: 32
 orthogonal: true
 freeze_center: true
 project_assignment: true
-pos_embed_dim: 360
 forward_inputs: ["node_feature"]

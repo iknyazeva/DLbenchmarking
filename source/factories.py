@@ -5,6 +5,7 @@ from importlib import import_module
 from omegaconf import DictConfig
 from torch.utils import data as utils
 import torch
+import torch.nn as nn
 # Import your data loading functions and models
 from source.dataset.dataloader import init_stratified_dataloader, init_dataloader # Assuming this is your stratified loader
 from source.components import LRScheduler, get_param_group_no_wd
@@ -209,6 +210,27 @@ def trainer_factory(cfg: DictConfig, model, optimizers, schedulers, dataloaders,
         dataloaders=dataloaders,
         logger=logger
     )
+
+def positional_encoding_factory(cfg: DictConfig) -> nn.Module:
+    """Dynamically creates a positional encoding module from config."""
+    # If no pos_encoding is defined, return None
+    if 'pos_encoding' not in cfg.model or cfg.model.pos_encoding is None:
+        return None
+    if cfg.model.pos_encoding.name.lower() == 'none':
+        return None
+
+    pe_cfg = cfg.model.pos_encoding
+    class_name = pe_cfg.name
+    
+    # Dynamically import the class from our new components file
+    try:
+        pe_module = import_module("source.utils.node_embedding")
+        pe_class = getattr(pe_module, class_name)
+    except (ImportError, AttributeError) as e:
+        raise ImportError(f"Could not find PositionalEncoding class '{class_name}'.") from e
+        
+    return pe_class(cfg)
+
 def components_factory(cfg: DictConfig, model: torch.nn.Module):
     """
     Factory to create optimizer, criterion, and scheduler.

@@ -7,7 +7,6 @@ import numpy as np
 import torch
 from pathlib import Path
 from source.models import BrainNetworkTransformer
-from models.brainnetworktransformer import TransPoolingEncoder
 
 
 

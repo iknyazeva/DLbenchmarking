@@ -2,11 +2,12 @@ defaults:
   - dataset: ABIDE
   - model: bnt
   - optimizer: adam
-  - training: debug
-  - datasz: 100p
-  - preprocess: inclass_node_mixup
+  - training: debug #basic_supervised
+  - datasz: 30p
+  - preprocess: inclass_node_mixup #default
+  - _self_ 
 
-repeat_time: 2
+repeat_time: 1
 log_path: result
 experiment_name: BNTTransformerExperiments
 seed: 42

@@ -1,12 +1,9 @@
 import torch
-from torch.nn import TransformerEncoderLayer
-from torch import Tensor
-from typing import Optional
-import torch.nn.functional as F
 import torch.nn as nn
-from utils import DEC
+from source.utils.bnt_components import TransPoolingEncoder
 from omegaconf import DictConfig
 from .base import BaseModel
+from source.factories import positional_encoding_factory
 
 
 class BrainNetworkTransformer(BaseModel):
@@ -18,12 +15,17 @@ class BrainNetworkTransformer(BaseModel):
         self.attention_list = nn.ModuleList()
         forward_dim = config.dataset.node_sz
 
-        self.pos_encoding = config.model.pos_encoding
-        if self.pos_encoding == 'identity':
-            self.node_identity = nn.Parameter(torch.zeros(
-                config.dataset.node_sz, config.model.pos_embed_dim), requires_grad=True)
-            forward_dim = config.dataset.node_sz + config.model.pos_embed_dim
-            nn.init.kaiming_normal_(self.node_identity)
+        #self.pos_encoding = config.model.pos_encoding
+        self.pos_encoder = positional_encoding_factory(config)
+        #if self.pos_encoding == 'identity':
+        #    self.node_identity = nn.Parameter(torch.zeros(
+        #        config.dataset.node_sz, config.model.pos_embed_dim), requires_grad=True)
+        #    forward_dim = config.dataset.node_sz + config.model.pos_embed_dim
+        #    nn.init.kaiming_normal_(self.node_identity)
+
+        if self.pos_encoder is not None:
+            # We can get the embedding dimension from the config
+            forward_dim += config.model.pos_encoding.embed_dim
 
         sizes = config.model.sizes
         sizes[0] = config.dataset.node_sz
@@ -59,8 +61,8 @@ class BrainNetworkTransformer(BaseModel):
 
         bz, _, _, = node_feature.shape
 
-        if self.pos_encoding == 'identity':
-            pos_emb = self.node_identity.expand(bz, *self.node_identity.shape)
+        if self.pos_encoder is not None:
+            pos_emb = self.pos_encoder(node_feature)
             node_feature = torch.cat([node_feature, pos_emb], dim=-1)
 
         assignments = []
@@ -106,98 +108,3 @@ class BrainNetworkTransformer(BaseModel):
 
 
 
-class TransPoolingEncoder(nn.Module):
-    """
-    Transformer encoder with Pooling mechanism.
-    Input size: (batch_size, input_node_num, input_feature_size)
-    Output size: (batch_size, output_node_num, input_feature_size)
-    """
-
-    def __init__(self, input_feature_size, input_node_num, hidden_size, output_node_num, nhead=4,
-                 pooling=True, orthogonal=True, freeze_center=False, project_assignment=True):
-        super().__init__()
-        self.transformer = InterpretableTransformerEncoder(d_model=input_feature_size, nhead=nhead,
-                                                           dim_feedforward=hidden_size,
-                                                           batch_first=True)
-       
-       # self.transformer = TransformerEncoderLayer(d_model=input_feature_size, nhead=4,
-       #                                             dim_feedforward=hidden_size,
-       #                                             dropout=0.1,
-       #                                             batch_first=True)
-        self.pooling = pooling
-        if pooling:
-            encoder_hidden_size = 32
-            self.encoder = nn.Sequential(
-                nn.Linear(input_feature_size *
-                          input_node_num, encoder_hidden_size),
-                nn.LeakyReLU(),
-                nn.Linear(encoder_hidden_size, encoder_hidden_size),
-                nn.LeakyReLU(),
-                nn.Linear(encoder_hidden_size,
-                          input_feature_size * input_node_num),
-            )
-            self.dec = DEC(cluster_number=output_node_num, hidden_dimension=input_feature_size, encoder=self.encoder,
-                           orthogonal=orthogonal, freeze_center=freeze_center, project_assignment=project_assignment)
-
-    def is_pooling_enabled(self):
-        return self.pooling
-
-    def forward(self, x):
-        x = self.transformer(x)
-        if self.pooling:
-            x, assignment = self.dec(x)
-            return x, assignment
-        return x, None
-
-    def get_attention_weights(self):
-        return self.transformer.get_attention_weights()
-
-    def loss(self, assignment):
-        return self.dec.loss(assignment)
-
-
-
-class InterpretableTransformerEncoder(nn.TransformerEncoderLayer):
-    """
-    A TransformerEncoderLayer that saves the attention weights from its forward pass.
-    """
-    def __init__(self, *args, **kwargs):
-        # The __init__ method doesn't need to change.
-        super().__init__(*args, **kwargs)
-        self.attention_weights: Optional[Tensor] = None
-
-    # --- THIS IS THE CHANGE ---
-    # We override the public `forward` method directly.
-    def forward(self, src: Tensor, src_mask: Optional[Tensor] = None, 
-                src_key_padding_mask: Optional[Tensor] = None) -> Tensor:
-        
-        # This part of the logic is adapted from the source code of nn.TransformerEncoderLayer
-        # to ensure compatibility and capture the weights correctly.
-        
-        # --- Self-Attention Block ---
-        # We call the self-attention layer and explicitly ask for the weights.
-        if self.norm_first:
-            # Pre-normalization (LayerNorm -> Attention -> Add -> LayerNorm -> FF -> Add)
-            sa_output, self.attention_weights = self.self_attn(
-                self.norm1(src), src, src, # Pass normalized src to attention
-                attn_mask=src_mask,
-                key_padding_mask=src_key_padding_mask,
-                need_weights=True
-            )
-            x = src + self.dropout1(sa_output)
-            x = x + self._ff_block(self.norm2(x))
-        else:
-            # Post-normalization (Attention -> Add -> LayerNorm -> FF -> Add -> LayerNorm)
-            sa_output, self.attention_weights = self.self_attn(
-                src, src, src,
-                attn_mask=src_mask,
-                key_padding_mask=src_key_padding_mask,
-                need_weights=True
-            )
-            x = self.norm1(src + self.dropout1(sa_output))
-            x = self.norm2(x + self._ff_block(x))
-        
-        return x
-
-    def get_attention_weights(self) -> Optional[Tensor]:
-        return self.attention_weights
