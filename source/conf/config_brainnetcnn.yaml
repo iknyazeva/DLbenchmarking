@@ -1,5 +1,5 @@
 defaults:
-  - dataset: ABIDE_SCH
+  - dataset: ABIDE
   - model: brainnetcnn # mlp2hl, fbnetgen, bnt, transformer
   - optimizer: adam
   - training: basic_supervised
@@ -8,7 +8,7 @@ defaults:
 
 repeat_time: 1
 log_path: result
-experiment_name: BrainNetCNNexperiments
+experiment_name: Ablation
 seed: 42
 
 project: DLBenchmarking

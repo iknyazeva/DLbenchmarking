@@ -1,9 +1,9 @@
 name: BrainNetCNN
-num_E2Eblock: 1
-E2E_channels: [32,] # 
-E2N_channels: 32 # out channel
-N2G_channels: 16 # out channel
-hidden_out_Linear: [128, 2] # last is num classes
+num_E2Eblock: 2
+E2E_channels: [32, 32] # 
+E2N_channels: 64 # out channel
+N2G_channels: 256 # out channel
+hidden_out_Linear: [256, 128, 2] # last is num classes
 dropout_rate: 0.3
 preserve_checkpoints: False
 forward_inputs: ["node_feature"]
