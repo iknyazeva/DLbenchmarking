@@ -11,7 +11,10 @@ def load_abide_data(cfg: DictConfig):
     final_pearson = data["corr"]
     labels = data["label"]
     site = data['site']
-    groups = data['groups']
+    if 'groups' in data.keys():
+        groups = data['groups']
+    else:
+        groups = None
 
     scaler = StandardScaler(mean=np.mean(
         final_timeseires), std=np.std(final_timeseires))

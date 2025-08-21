@@ -154,15 +154,15 @@ def init_group_dataloader(cfg: DictConfig, *data_tuple):
     val_test_groups = groups[val_test_idx]
     try:
         split2 = GroupShuffleSplit(n_splits=1, 
-                                        test_size=test_length, 
-                                        random_state=cfg.seed)
+                                   test_size=test_length, 
+                                   random_state=cfg.seed)
             
         val_idx_rel, test_idx_rel = next(split2.split(final_timeseires[val_test_idx], 
                                                       val_test_groups,
                                                       groups=val_test_groups))
     
     except ValueError:
-        #min_train_size = np.unique(val_test_groups).shape[0] + 2
+
         split2 = GroupShuffleSplit(n_splits=1, 
                                    train_size=0.5, 
                                    random_state=cfg.seed)
