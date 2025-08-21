@@ -86,20 +86,40 @@ def init_stratified_dataloader(cfg: DictConfig, *data_tuple) -> List[utils.DataL
 
     # First split: Separate training set from (validation + test) set
     split1 = StratifiedShuffleSplit(n_splits=1, 
-                                    #test_size=(val_length + test_length), 
                                     train_size=train_length, 
                                     random_state=cfg.seed)
     
     train_idx, val_test_idx = next(split1.split(final_timeseires, site_info))
     
     # Second split: Separate validation and test sets from the remainder
-    #val_test_site_info = site_info[val_test_idx]
-    #split2 = StratifiedShuffleSplit(n_splits=1, test_size=test_length, random_state=cfg.seed)
-    #val_idx_rel, test_idx_rel = next(split2.split(final_timeseires[val_test_idx], val_test_site_info))
+    val_test_site_info = site_info[val_test_idx]
+
+    try:
+        split2 = StratifiedShuffleSplit(n_splits=1, 
+                                        test_size=test_length, 
+                                        random_state=cfg.seed)
+        
+        val_idx_rel, test_idx_rel = next(split2.split(final_timeseires[val_test_idx], val_test_site_info))
+
+    except ValueError:
+        count = Counter(val_test_site_info)
+        failed = [k for k, v in count.items() if v < 2]
+
+        idx = [i for i, x in enumerate(val_test_site_info) if x in failed]
+        val_test_idx = np.delete(val_test_idx, idx)
+
+        #print('Failed on sites:', failed)
+
+        split2 = StratifiedShuffleSplit(n_splits=1, 
+                                        test_size=test_length, 
+                                        random_state=cfg.seed)
+        val_idx_rel, test_idx_rel = next(split2.split(final_timeseires[val_test_idx], site_info[val_test_idx]))
+        
+        
     
     # Convert relative indices to absolute indices
-    #val_idx = val_test_idx[val_idx_rel]
-    #test_idx = val_test_idx[test_idx_rel]
+    val_idx = val_test_idx[val_idx_rel]
+    test_idx = val_test_idx[test_idx_rel]
     val_idx = val_test_idx
     test_idx = val_test_idx
 
@@ -125,14 +145,41 @@ def init_group_dataloader(cfg: DictConfig, *data_tuple):
 
     # First split: Separate training set from (validation + test) set
     split1 = GroupShuffleSplit(n_splits=1, 
-                               #test_size=(val_length + test_length), 
                                train_size=cfg.dataset.train_set, 
                                random_state=cfg.seed)
     
-    for train_idx, val_idx in split1.split(final_timeseires, groups, groups=groups):
+    train_idx, val_test_idx = next(split1.split(final_timeseires, 
+                                                site_info, groups=groups))
+    
+    val_test_groups = groups[val_test_idx]
+    try:
+        split2 = GroupShuffleSplit(n_splits=1, 
+                                        test_size=test_length, 
+                                        random_state=cfg.seed)
+            
+        val_idx_rel, test_idx_rel = next(split2.split(final_timeseires[val_test_idx], 
+                                                      val_test_groups,
+                                                      groups=val_test_groups))
+    
+    except ValueError:
+        #min_train_size = np.unique(val_test_groups).shape[0] + 2
+        split2 = GroupShuffleSplit(n_splits=1, 
+                                   train_size=0.5, 
+                                   random_state=cfg.seed)
+            
+        val_idx_rel, test_idx_rel = next(split2.split(final_timeseires[val_test_idx], 
+                                                      val_test_groups,
+                                                      groups=val_test_groups))
 
-        train_dataset = utils.TensorDataset(final_timeseires[train_idx], final_pearson[train_idx], labels[train_idx])
-        val_dataset = utils.TensorDataset(final_timeseires[val_idx], final_pearson[val_idx], labels[val_idx])
-        test_dataset = utils.TensorDataset(final_timeseires[val_idx], final_pearson[val_idx], labels[val_idx])
+    
+    val_idx = val_test_idx[val_idx_rel]
+    test_idx = val_test_idx[test_idx_rel]
+    val_idx = val_test_idx
+    test_idx = val_test_idx
+
+    # Create datasets from the stratified indices
+    train_dataset = utils.TensorDataset(final_timeseires[train_idx], final_pearson[train_idx], labels[train_idx])
+    val_dataset = utils.TensorDataset(final_timeseires[val_idx], final_pearson[val_idx], labels[val_idx])
+    test_dataset = utils.TensorDataset(final_timeseires[test_idx], final_pearson[test_idx], labels[test_idx])
     
     return _create_dataloaders_from_datasets(cfg, train_dataset, val_dataset, test_dataset)
