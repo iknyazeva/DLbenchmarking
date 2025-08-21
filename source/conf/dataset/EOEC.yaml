@@ -6,6 +6,7 @@ train_set: 0.7
 val_set: 0.1
 path: /data/Projects/eoec.npy
 stratified: False
+groups: True
 node_sz: 182
 node_feature_sz: 182
 drop_last: True

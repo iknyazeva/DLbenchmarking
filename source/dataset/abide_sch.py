@@ -11,6 +11,7 @@ def load_abide_sch_data(cfg: DictConfig):
     final_pearson = data["corr"]
     labels = data["label"]
     site = data["site"]
+    groups = data['groups']
 
     scaler = StandardScaler(mean=np.mean(final_timeseires), 
                             std=np.std(final_timeseires))
@@ -19,9 +20,11 @@ def load_abide_sch_data(cfg: DictConfig):
 
     final_timeseires, final_pearson, labels = [torch.from_numpy(
         data).float() for data in (final_timeseires, final_pearson, labels)]
+    
+    final_timeseires = final_timeseires.permute(0, 2, 1)
 
     with open_dict(cfg):
         cfg.dataset.node_sz, cfg.dataset.node_feature_sz = final_pearson.shape[1:]
         cfg.dataset.timeseries_sz = final_timeseires.shape[2]
 
-    return final_timeseires, final_pearson, labels, site 
+    return final_timeseires, final_pearson, labels, site, groups

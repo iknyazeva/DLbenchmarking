@@ -2,7 +2,7 @@ import torch
 import torch.utils.data as utils
 from omegaconf import DictConfig, open_dict
 from typing import List
-from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.model_selection import StratifiedShuffleSplit, GroupShuffleSplit
 import numpy as np
 import torch.nn.functional as F
 
@@ -71,7 +71,7 @@ def init_stratified_dataloader(cfg: DictConfig, *data_tuple) -> List[utils.DataL
     """
     Splits data using stratification based on site and creates DataLoaders.
     """
-    final_timeseires, final_pearson, labels, site_info = data_tuple
+    final_timeseires, final_pearson, labels, site_info, groups = data_tuple
 
     # The label tensor needs to be 1D for this function's logic
     labels = labels.long()
@@ -104,4 +104,31 @@ def init_stratified_dataloader(cfg: DictConfig, *data_tuple) -> List[utils.DataL
     val_dataset = utils.TensorDataset(final_timeseires[val_idx], final_pearson[val_idx], labels[val_idx])
     test_dataset = utils.TensorDataset(final_timeseires[test_idx], final_pearson[test_idx], labels[test_idx])
 
+    return _create_dataloaders_from_datasets(cfg, train_dataset, val_dataset, test_dataset)
+
+def init_group_dataloader(cfg: DictConfig, *data_tuple):
+
+    final_timeseires, final_pearson, labels, site_info, groups = data_tuple
+
+    labels = labels.long()
+
+    length = len(final_timeseires)
+    train_length = int(length * cfg.dataset.train_set)
+    val_length = int(length * cfg.dataset.val_set)
+    test_length = length - train_length - val_length
+
+    _update_config_with_steps(cfg, train_length)
+
+    # First split: Separate training set from (validation + test) set
+    split1 = GroupShuffleSplit(n_splits=1, 
+                               #test_size=(val_length + test_length), 
+                               train_size=cfg.dataset.train_set, 
+                               random_state=cfg.seed)
+    
+    for train_idx, val_idx in split1.split(final_timeseires, groups, groups=groups):
+
+        train_dataset = utils.TensorDataset(final_timeseires[train_idx], final_pearson[train_idx], labels[train_idx])
+        val_dataset = utils.TensorDataset(final_timeseires[val_idx], final_pearson[val_idx], labels[val_idx])
+        test_dataset = utils.TensorDataset(final_timeseires[val_idx], final_pearson[val_idx], labels[val_idx])
+    
     return _create_dataloaders_from_datasets(cfg, train_dataset, val_dataset, test_dataset)

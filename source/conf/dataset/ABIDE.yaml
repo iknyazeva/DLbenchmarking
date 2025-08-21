@@ -5,7 +5,8 @@ val_batch_size: 20
 train_set: 0.7
 val_set: 0.1
 path: /data/Projects/ABIDE/Kan_2022/abide.npy
-stratified: True
+stratified: True # использовать ли стратификацию
+groups: False
 node_sz: 200
 node_feature_sz: 200
 drop_last: True

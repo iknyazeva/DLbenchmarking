@@ -7,7 +7,7 @@ from torch.utils import data as utils
 import torch
 import torch.nn as nn
 # Import your data loading functions and models
-from source.dataset.dataloader import init_stratified_dataloader, init_dataloader # Assuming this is your stratified loader
+from source.dataset.dataloader import init_stratified_dataloader, init_dataloader, init_group_dataloader # Assuming this is your stratified loader
 from source.components import LRScheduler, get_param_group_no_wd
 from source.components.logger import set_file_handler
 
@@ -52,9 +52,16 @@ def dataset_factory(cfg: DictConfig) -> List[torch.utils.data.DataLoader]:
 
     # 5. Create the final DataLoader objects based on the 'stratified' flag.
     # Use .get() to safely access the key, defaulting to False if it's not present.
-    if cfg.dataset.get('stratified', False):
+
+    #if cfg.dataset.get('stratified', False):
+    if cfg.dataset.stratified:
         logging.info(f"Using stratified dataloader for '{dataset_name}' dataset.")
         dataloaders = init_stratified_dataloader(cfg, *raw_data_tuple)
+
+    elif cfg.dataset.groups:
+        logging.info(f"Using group dataloader for '{dataset_name}' dataset.")
+        dataloaders = init_group_dataloader(cfg, *raw_data_tuple)
+
     else:
         logging.info(f"Using standard dataloader for '{dataset_name}' dataset.")
         # You would need to have this non-stratified version implemented

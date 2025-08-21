@@ -6,7 +6,8 @@ val_batch_size: 20
 train_set: 0.7
 val_set: 0.1
 path: /data/Projects/abide_sch_padded.npy
-stratified: False
+stratified: True
+groups: False
 node_sz: 182
 node_feature_sz: 182
 drop_last: True
