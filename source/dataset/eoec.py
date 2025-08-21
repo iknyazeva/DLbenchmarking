@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from .preprocess import StandardScaler
+from .preprocess import StandardScaler, cut_timeseries
 from omegaconf import DictConfig, open_dict
 
 
@@ -13,9 +13,12 @@ def load_eoec_data(cfg: DictConfig):
     site = data['site']
     groups = data['groups']
 
+    final_timeseires, labels, site, groups = cut_timeseries(final_timeseires, 
+                                                            labels, site, groups, 
+                                                            cfg.dataset.ts_length)
+
     scaler = StandardScaler(mean=np.mean(
         final_timeseires), std=np.std(final_timeseires))
-
     final_timeseires = scaler.transform(final_timeseires)
 
     final_timeseires, final_pearson, labels = [torch.from_numpy(

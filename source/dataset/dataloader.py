@@ -5,6 +5,7 @@ from typing import List
 from sklearn.model_selection import StratifiedShuffleSplit, GroupShuffleSplit
 import numpy as np
 import torch.nn.functional as F
+from collections import Counter
 
 
 def _update_config_with_steps(cfg: DictConfig, train_length: int):
@@ -84,20 +85,23 @@ def init_stratified_dataloader(cfg: DictConfig, *data_tuple) -> List[utils.DataL
     _update_config_with_steps(cfg, train_length)
 
     # First split: Separate training set from (validation + test) set
-    split1 = StratifiedShuffleSplit(
-        n_splits=1, test_size=(val_length + test_length), train_size=train_length, random_state=cfg.seed
-
-    )
+    split1 = StratifiedShuffleSplit(n_splits=1, 
+                                    #test_size=(val_length + test_length), 
+                                    train_size=train_length, 
+                                    random_state=cfg.seed)
+    
     train_idx, val_test_idx = next(split1.split(final_timeseires, site_info))
     
     # Second split: Separate validation and test sets from the remainder
-    val_test_site_info = site_info[val_test_idx]
-    split2 = StratifiedShuffleSplit(n_splits=1, test_size=test_length, random_state=cfg.seed)
-    val_idx_rel, test_idx_rel = next(split2.split(final_timeseires[val_test_idx], val_test_site_info))
+    #val_test_site_info = site_info[val_test_idx]
+    #split2 = StratifiedShuffleSplit(n_splits=1, test_size=test_length, random_state=cfg.seed)
+    #val_idx_rel, test_idx_rel = next(split2.split(final_timeseires[val_test_idx], val_test_site_info))
     
     # Convert relative indices to absolute indices
-    val_idx = val_test_idx[val_idx_rel]
-    test_idx = val_test_idx[test_idx_rel]
+    #val_idx = val_test_idx[val_idx_rel]
+    #test_idx = val_test_idx[test_idx_rel]
+    val_idx = val_test_idx
+    test_idx = val_test_idx
 
     # Create datasets from the stratified indices
     train_dataset = utils.TensorDataset(final_timeseires[train_idx], final_pearson[train_idx], labels[train_idx])
