@@ -11,11 +11,14 @@ def load_eoec_data(cfg: DictConfig):
     final_pearson = data["corr"]
     labels = data["label"]
     site = data['site']
-    groups = data['groups']
+    if 'groups' in data.keys():
+        groups = data['groups']
+    else:
+        groups = None
 
-    final_timeseires, labels, site, groups = cut_timeseries(final_timeseires, 
-                                                            labels, site, groups, 
-                                                            cfg.dataset.ts_length)
+    final_timeseires, labels, site = cut_timeseries(final_timeseires, 
+                                                    labels, site, 
+                                                    cfg.dataset.ts_length)
 
     scaler = StandardScaler(mean=np.mean(
         final_timeseires), std=np.std(final_timeseires))

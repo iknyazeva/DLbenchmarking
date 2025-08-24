@@ -1,11 +1,11 @@
 name: abide_sch
 ts_length: 200
-batch_size: 40
-test_batch_size: 20
-val_batch_size: 20
+batch_size: 16
+test_batch_size: 16
+val_batch_size: 16
 train_set: 0.7
 val_set: 0.1
-path: /data/Projects/abide_sch_padded.npy
+path: /Users/irinaknyazeva/Yandex.Disk.localized/Projects/BrainIHBProjects/LabNeuroimagingProjects/DLfMRI/datasets/abide_sch_padded.npy #/data/Projects/abide_sch_padded.npy
 stratified: True
 groups: False
 node_sz: 182
