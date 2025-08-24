@@ -4,11 +4,12 @@ defaults:
   - optimizer: adam
   - training: basic_supervised
   - datasz: 100p
-  - preprocess: default
+  - preprocess:  default #inclass_node_mixup  - 0.5 score
+  - _self_ 
 
-repeat_time: 5
+repeat_time: 4
 log_path: result
-experiment_name: MeanMLPexperiments
+experiment_name: MeanMLP_ABIDE
 seed: 42
 
 project: DLBenchmarking

@@ -39,48 +39,75 @@ fi
 
 # --- Ablation Study 1: Effect of Different Positional Encodings ---
 # We run the model three times, swapping out the entire pos_encoding block.
-log "Starting Ablation Study 1: Effect of Positional Encodings"
+log "Starting Ablation Study 1: Effect of atlas"
 
-echo "Running with NO positional encoding..."
-python $PYTHON_SCRIPT model.pos_encoding.name=none
+echo "Running with ABIDE..."
+#python $PYTHON_SCRIPT model.pos_encoding.name=none
+python $PYTHON_SCRIPT dataset=ABIDE
 
-echo "Running with IDENTITY (learnable) positional encoding..."
-python $PYTHON_SCRIPT model.pos_encoding.name=IdentityEncoding 
+echo "Running with ABIDE SCH..."
+#python $PYTHON_SCRIPT model.pos_encoding.name=none
+python $PYTHON_SCRIPT dataset=ABIDE_SCH model.pos_encoding.embed_dim=34 
 
-echo "Running with RRWP (random walk) positional encoding..."
-python $PYTHON_SCRIPT model.pos_encoding.name=RRWPEncoding 
+log "Starting Ablation Study 1: Effect of atlas: round 2"
+
+
+echo "Running with ABIDE..."
+#python $PYTHON_SCRIPT model.pos_encoding.name=none
+python $PYTHON_SCRIPT dataset=ABIDE
+
+echo "Running with ABIDE SCH..."
+#python $PYTHON_SCRIPT model.pos_encoding.name=none
+python $PYTHON_SCRIPT dataset=ABIDE_SCH model.pos_encoding.embed_dim=34 
+
+#echo "Running with IDENTITY (learnable) positional encoding..."
+#python $PYTHON_SCRIPT model.pos_encoding.name=IdentityEncoding 
+
+#echo "Running with RRWP (random walk) positional encoding..."
+#python $PYTHON_SCRIPT model.pos_encoding.name=RRWPEncoding 
 
 echo "Ablation Study 1 finished."
 
 
 # --- Ablation Study 2: Effect of Transformer Hidden Dimension ---
 # This study tests the size of the feed-forward network inside the transformer.
-log "Starting Ablation Study 2: Transformer Feed-Forward Dimension"
+#log "Starting Ablation Study 2: Transformer Feed-Forward Dimension"
 
-echo "Running with dim_feedforward=256..."
-python $PYTHON_SCRIPT model.dim_feedforward=256
+#echo "Running with dim_feedforward=256..."
+#python $PYTHON_SCRIPT model.dim_feedforward=256
 
-echo "Running with dim_feedforward=512..."
-python $PYTHON_SCRIPT model.dim_feedforward=512
+#echo "Running with dim_feedforward=512..."
+#python $PYTHON_SCRIPT model.dim_feedforward=512
 
-echo "Running with dim_feedforward=1024..."
-python $PYTHON_SCRIPT model.dim_feedforward=1024
+#echo "Running with dim_feedforward=1024..."
+#python $PYTHON_SCRIPT model.dim_feedforward=1024
 
-echo "Ablation Study 2 finished."
+#echo "Ablation Study 2 finished."
 
 
 # --- Ablation Study 3: Effect of Preprocessing  ---
 # This study tests the size of the feed-forward network inside the transformer.
-log "Starting Ablation Study 3: Augmentation"
+log "Starting Ablation Study 2: Augmentation"
 
 echo "Running with no augmentation..."
 python $PYTHON_SCRIPT preprocess=default
 
 echo "Running with inclass_node_mixup"
-python $PYTHON_SCRIPT preprocess=inclass_node_mixup
+python $PYTHON_SCRIPT preprocess=default dataset=ABIDE_SCH model.pos_encoding.embed_dim=34 
 
 
-echo "Ablation Study 3 finished."
+echo "Ablation Study 2 finished."
+
+log "Starting Ablation Study 2: Augmentation: round 2"
+
+echo "Running with no augmentation..."
+python $PYTHON_SCRIPT preprocess=default
+
+echo "Running with inclass_node_mixup"
+python $PYTHON_SCRIPT preprocess=default dataset=ABIDE_SCH model.pos_encoding.embed_dim=34 
+
+
+echo "Ablation Study 2 finished."
 
 
 

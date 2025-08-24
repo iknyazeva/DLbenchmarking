@@ -1,14 +1,14 @@
 defaults:
-  - dataset: ABIDE
-  - model: mlp2hl # brainnetcnn, fbnetgen, bnt, transformer
+  - dataset: ABIDE  #ABIDE EOEC
+  - model: mlp3hl # brainnetcnn, fbnetgen, bnt, transformer
   - optimizer: adam
-  - training: basic_supervised
+  - training: basic_supervised #debug
   - datasz: 100p
-  - preprocess: mlp_no_mixup
+  - preprocess: mlp_mixup #mlp_no_mixup
 
-repeat_time: 2
+repeat_time: 5
 log_path: result
-experiment_name: MLPexperiments
+experiment_name: MLP_ABIDE
 seed: 42
 
 project: DLBenchmarking

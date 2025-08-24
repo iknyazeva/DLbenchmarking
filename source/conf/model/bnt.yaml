@@ -7,7 +7,7 @@ sizes: [200, 100]  # Note: The input node size should not be included here, numb
 pooling: [false, true]
 pos_encoding:
  name: RRWPEncoding  # IdentityEncoding, RRWPEncoding, none
- embed_dim: 32
+ embed_dim: 32 #32 number of features + node numbers should divide 2 4
 orthogonal: true
 freeze_center: true
 project_assignment: true

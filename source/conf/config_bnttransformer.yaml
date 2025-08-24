@@ -7,9 +7,9 @@ defaults:
   - preprocess: inclass_node_mixup #default
   - _self_ 
 
-repeat_time: 4
+repeat_time: 5
 log_path: result
-experiment_name: BNTTransformerExperiments
+experiment_name: BNTransformer_ABIDE
 seed: 42
 
 project: DLBenchmarking

@@ -5,6 +5,7 @@ defaults:
   - training: basic_supervised
   - datasz: 100p
   - preprocess: inclass_node_mixup
+  - _self_ 
 
 repeat_time: 5
 log_path: result
