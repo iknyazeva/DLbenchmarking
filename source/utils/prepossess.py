@@ -1,6 +1,9 @@
 import torch
 import numpy as np
 
+def append_to_4head(pearson_matrices: torch.Tensor):
+    pass
+    
 
 def pearson_to_vector(pearson_matrices: torch.Tensor) -> torch.Tensor:
     """Converts a batch of Pearson matrices to a batch of vectors.

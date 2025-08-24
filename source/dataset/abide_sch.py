@@ -12,6 +12,7 @@ def load_abide_sch_data(cfg: DictConfig):
     labels = data["label"]
     site = data["site"]
     groups = data['groups']
+    site =  np.array([col.split('_')[0] if '_' in col else col for col in site])
 
     final_timeseires, labels, site, groups = cut_timeseries(final_timeseires, 
                                                             labels, site, groups, 
@@ -31,4 +32,4 @@ def load_abide_sch_data(cfg: DictConfig):
         cfg.dataset.node_sz, cfg.dataset.node_feature_sz = final_pearson.shape[1:]
         cfg.dataset.timeseries_sz = final_timeseires.shape[2]
 
-    return final_timeseires, final_pearson, labels, site, groups
+    return final_timeseires, final_pearson, labels, site

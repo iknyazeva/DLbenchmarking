@@ -5,7 +5,7 @@ import mlflow
 import pandas as pd
 from abc import ABC, abstractmethod
 from importlib import import_module
-from sklearn.metrics import roc_auc_score, classification_report, precision_recall_fscore_support
+from sklearn.metrics import roc_auc_score, classification_report, precision_recall_fscore_support, accuracy_score
 from tqdm import tqdm
 from pathlib import Path
 from omegaconf import DictConfig
@@ -289,6 +289,7 @@ class BaseTrainer(ABC):
         
         # 2. Get binary predictions by thresholding probabilities at 0.5
         preds_binary = (probs > 0.5).astype(int)
+        acc = accuracy_score(labels, preds_binary)
         
         # 3. Calculate precision, recall, f1-score (micro-averaged)
         precision, recall, f1, _ = precision_recall_fscore_support(
@@ -305,6 +306,7 @@ class BaseTrainer(ABC):
         # 5. Assemble the final metrics dictionary
         metrics_dict = {
             'auc': auc,
+            'acc': acc,
             'precision_micro': precision,
             'recall_micro': recall,
             'f1_micro': f1,

@@ -24,13 +24,15 @@ class LRScheduler:
         warm_up_steps = lr_config.warm_up_steps
         total_steps = self.training_config.total_steps
 
-        assert 0 <= step <= total_steps
+       # assert 0 <= step <= total_steps
         if step < warm_up_steps:
             current_ratio = step / warm_up_steps
             self.lr = warm_up_from + (base_lr - warm_up_from) * current_ratio
         else:
             current_ratio = (step - warm_up_steps) / \
                 (total_steps - warm_up_steps)
+            current_ratio = min(current_ratio, 1.0)
+            
             if lr_mode == 'step':
                 count = bisect.bisect_left(lr_config.milestones, current_ratio)
                 self.lr = base_lr * pow(lr_config.decay_factor, count)
